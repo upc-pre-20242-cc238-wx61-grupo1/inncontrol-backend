@@ -11,6 +11,7 @@ import com.github.inncontrol.employees.domain.services.EmployeeCommandService;
 import com.github.inncontrol.employees.infrastructure.persistence.jpa.EmployeeRepository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -34,9 +35,23 @@ public class EmployeeCommandServiceImpl implements EmployeeCommandService {
                 throw new IllegalArgumentException("Employee already exists");
             });
         }
+
+        var managerProfileId = externalProfileService.fetchProfileIdByEmail(command.managerEmail());
+        Employee manager = null; // Inicializa a null
+
+
+//&& command.role().equals(Role.EMPLOYEE.name())
+        if (managerProfileId.isPresent() && command.role().equals("EMPLOYEE")  ) {
+            var managerOptional = employeeRepository.findByProfileId(managerProfileId.get());
+            if (managerOptional.isPresent()) {
+                manager = managerOptional.get();
+            } else {
+                throw new IllegalArgumentException("Manager does not exist, error in repository" + command.role());
+            }
+        }
         if (profileId.isEmpty()) throw new IllegalArgumentException("Unable to create profile");
         var role = Role.valueOf(command.role().toUpperCase());
-        var employee = new Employee(profileId.get(), command.salary(), command.contractInformation(), role);
+        var employee = new Employee(profileId.get(), command.salary(), command.contractInformation(), role, manager);
         employeeRepository.save(employee);
         return employee.getId();
     }
