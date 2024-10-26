@@ -13,7 +13,8 @@ public class EmployeeResourceFromEntityAssember {
                 entity.getSalary(),
                 entity.getInitiationContract(),
                 entity.getTerminateContract(),
-                entity.getProfileId()
+                entity.getProfileId(),
+                entity.getManagerId()
         );
     }
 }

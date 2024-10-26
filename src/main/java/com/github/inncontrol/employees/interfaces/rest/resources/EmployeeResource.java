@@ -10,6 +10,7 @@ public record EmployeeResource(
         Double salary,
         Date initiationContract,
         Date terminationContract,
-        Long profileId
+        Long profileId,
+        Long managerId
 ) {
 }

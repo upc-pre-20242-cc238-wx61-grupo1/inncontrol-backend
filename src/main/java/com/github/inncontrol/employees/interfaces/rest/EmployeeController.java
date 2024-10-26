@@ -1,6 +1,7 @@
 package com.github.inncontrol.employees.interfaces.rest;
 
 
+import com.github.inncontrol.employees.domain.model.queries.GetAllEmployeeByManager;
 import com.github.inncontrol.employees.domain.model.queries.GetEmployeeByIdQuery;
 import com.github.inncontrol.employees.domain.model.queries.GetEmployeeByProfileIdQuery;
 import com.github.inncontrol.employees.domain.services.EmployeeCommandService;
@@ -18,7 +19,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "/api/v1/employees", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,6 +65,31 @@ public class EmployeeController {
         var employee = employeeQueryService.handle(getEmployeeById);
         var employeeResource = EmployeeResourceFromEntityAssember.toResourceFromEntity(employee.orElseThrow());
         return ResponseEntity.ok(employeeResource);
+    }
+    @GetMapping("/email")
+    public ResponseEntity<EmployeeResource> getEmployeeByEmail(@RequestParam String email) {
+        var profileId = profilesContextFacade.fetchProfileIdByEmail(email);
+        if (profileId == 0) return ResponseEntity.notFound().build();
+        var getEmployeeById = new GetEmployeeByProfileIdQuery(profileId);
+        var employee = employeeQueryService.handle(getEmployeeById);
+        var employeeResource = EmployeeResourceFromEntityAssember.toResourceFromEntity(employee.orElseThrow());
+        return ResponseEntity.ok(employeeResource);
+    }
+    @GetMapping("/manager")
+    public ResponseEntity<List<EmployeeResource>> getAllEmployeeByManager(@RequestParam String manager) {
+        var profileId = profilesContextFacade.fetchProfileIdByEmail(manager);
+        if (profileId == 0) return ResponseEntity.notFound().build();
+
+        var getEmployeeById = new GetEmployeeByProfileIdQuery(profileId);
+        var employee = employeeQueryService.handle(getEmployeeById);
+
+        var getAllEmployeeByManager = new GetAllEmployeeByManager(employee.orElseThrow());
+        var employees = employeeQueryService.handle(getAllEmployeeByManager);
+        var EmployeeResources = employees.stream()
+                .map(EmployeeResourceFromEntityAssember::toResourceFromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(EmployeeResources);
+
     }
 
     @GetMapping
