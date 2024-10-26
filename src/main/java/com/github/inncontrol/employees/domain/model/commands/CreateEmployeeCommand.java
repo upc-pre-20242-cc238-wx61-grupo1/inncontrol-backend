@@ -7,6 +7,7 @@ public record CreateEmployeeCommand(String firstName, String lastName,
                                     String email,
                                     Double salary,
                                     ContractInformation contractInformation,
-                                    String role
+                                    String role,
+                                    String managerEmail
 ) {
 }
