@@ -1,9 +1,6 @@
 package com.github.inncontrol.employees.domain.model.aggregates;
 
-import com.github.inncontrol.employees.domain.model.valueobjects.ContractInformation;
-import com.github.inncontrol.employees.domain.model.valueobjects.ProfileId;
-import com.github.inncontrol.employees.domain.model.valueobjects.Role;
-import com.github.inncontrol.employees.domain.model.valueobjects.SalaryEmployee;
+import com.github.inncontrol.employees.domain.model.valueobjects.*;
 import com.github.inncontrol.shared.domain.aggregates.AuditableAbstractAggregateRoot;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -25,6 +22,11 @@ public class Employee extends AuditableAbstractAggregateRoot<Employee> {
 
     @Embedded
     private ProfileId profileId;
+
+    @Getter
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    private Employee manager;
 
     public Employee() {
     }
@@ -51,7 +53,10 @@ public class Employee extends AuditableAbstractAggregateRoot<Employee> {
         this.contract = contract;
     }
 
-
+    public Employee(ProfileId profileId, Double salary, ContractInformation contract, Role role, Employee manager) {
+        this(profileId, salary, contract, role);
+        this.manager = manager;
+    }
 
     public Employee updateInformation(Double salary, ContractInformation contract, Role role) {
         this.salary = new SalaryEmployee(salary);
@@ -88,6 +93,11 @@ public class Employee extends AuditableAbstractAggregateRoot<Employee> {
     public Double getSalary() {
         return this.salary.salary();
     }
+
+    public Long getManagerId() {
+        return this.manager != null ? this.manager.getId() : null;
+    }
+
 
     public Employee updateSalary(Double salary) {
         this.salary = this.salary.updateSalary(salary);

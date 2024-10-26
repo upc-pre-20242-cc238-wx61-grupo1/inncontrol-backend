@@ -5,8 +5,9 @@ public record  CreateEmployeeResource(String firstName,
                                       String lastName,
                                       String phoneNumber,
                                       String email,
-                                        Double salary,
+                                      Double salary,
                                       ContractInformationResource contractInformationResource,
-                                        String role
+                                      String role,
+                                      String managerEmail
 ) {
 }
