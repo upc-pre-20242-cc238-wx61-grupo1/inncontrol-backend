@@ -42,7 +42,7 @@ public class TaskCommandServiceImpl implements TaskCommandService {
                 employeeId.get(),
                 command.employeeEmail()
         );
-         var textSms = "Task created: " + command.title() + " with due date: " + command.dueDate();
+         var textSms = "Task created: " + command.title() ;
          var createNotificationCommand = new CreateNotificationCommand(textSms,"+51957244746");
          notificationCommandService.handle(createNotificationCommand);
         return Optional.of(taskRepository.save(task));
