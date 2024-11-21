@@ -2,6 +2,9 @@ package com.github.inncontrol.task.application.internal.commandservice;
 
 import java.util.Optional;
 
+import com.github.inncontrol.notification.domain.model.commands.CreateNotificationCommand;
+import com.github.inncontrol.notification.domain.services.NotificationCommandService;
+import com.github.inncontrol.notification.infrastructure.persistence.jpa.repositories.NotificationRepository;
 import com.github.inncontrol.shared.application.internal.outboundedservices.acl.ExternalEmployeeService;
 import com.github.inncontrol.task.domain.model.commands.DeleteTaskCommand;
 import com.github.inncontrol.task.domain.model.valueobjects.EmployeeIdentifier;
@@ -24,6 +27,7 @@ public class TaskCommandServiceImpl implements TaskCommandService {
 
     private final TaskRepository taskRepository;
     private final ExternalEmployeeService employeeService;
+    private final NotificationCommandService notificationCommandService;
 
     @Override
     public Optional<Task> handle(CreateTaskCommand command) {
@@ -38,6 +42,9 @@ public class TaskCommandServiceImpl implements TaskCommandService {
                 employeeId.get(),
                 command.employeeEmail()
         );
+         var textSms = "Task created: " + command.title() + " with due date: " + command.dueDate();
+         var createNotificationCommand = new CreateNotificationCommand(textSms,"+51957244746");
+         notificationCommandService.handle(createNotificationCommand);
         return Optional.of(taskRepository.save(task));
     }
 
